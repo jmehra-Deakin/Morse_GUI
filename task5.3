@@ -1,0 +1,71 @@
+from MorseCodeDict import MORSE_CODE_DICT as morsedict
+import RPi.GPIO as GPIO
+from time import sleep
+import tkinter as tk
+
+pin = 21
+dash = 2.7
+dot = 0.5
+low = 0.8
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(pin,GPIO.OUT)
+
+root = tk.Tk()
+root.title("GPIO Control")
+root.geometry("350x100")
+
+def Dash():
+  
+    GPIO.output(pin, GPIO.HIGH)
+    sleep(dash)
+    GPIO.output(pin, GPIO.LOW)
+    sleep(low)
+
+def Dot():
+
+    GPIO.output(pin, GPIO.HIGH)
+    sleep(dot)
+    GPIO.output(pin, GPIO.LOW)
+    sleep(low)
+
+def BlinkMorseCode():
+    
+    try:
+        status = tk.StringVar()
+        status.set("Blinking")
+        label = tk.Label(root, textvariable=status)
+        label.grid(row=3, column=1)
+        root.update_idletasks()
+        message = user_input.get().strip().upper().replace(" ","")
+
+        if(len(message)>0):
+            for char in message:
+
+                try:
+                    morsecode = morsedict[char]
+  
+                    for x in morsecode:
+  
+                        if(x == "1"):
+                            Dash()
+                        else:
+                            Dot()
+                except:
+                    continue
+            status.set("Done Blinking")
+            root.update_idletasks()
+    except:
+        tk.Label(root, text="Please enter some Text").grid(row=3,column=1)
+
+
+tk.Label(root, text="Please enter a string less than 12 chars").grid(row=0,column=0)
+
+user_input = tk.Entry(root,width=15)
+user_input.grid(row=0,column=1)
+
+ONbutton = tk.Button(root, text="Blink Morse Code", command=BlinkMorseCode )
+ONbutton.grid(row=2, column=0)
+Exitbutton = tk.Button(root, text="Exit", command=root.destroy)
+Exitbutton.grid(row=3, column=0)
+root.mainloop()
+GPIO.cleanup()
